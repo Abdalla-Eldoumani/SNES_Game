@@ -1,0 +1,66 @@
+# This is a GDB command file, which can be specified with the -x option when
+# starting GDB. The following commands start the OpenOCD GDB server, lists
+# the current processes, connects GDB to the OpenOCD server, diverts OpenOCD
+# log messages to a log file, shows the possible debugging targets (cores on
+# the CPU), and finally loads the executable specified on the command line
+# into RAM, so it is ready to run from the debugger.
+
+
+# Start the OpenOCD GDB server as a background process. The -d0 option tells
+# openocd to only print out error messages, and suppress warnings, informational
+# messages, and debug messages.
+shell echo " "
+shell echo " "
+shell echo "Start the OpenOCD GDB server as a background process:"
+shell openocd -d0 &
+shell echo " "
+shell sleep 1
+shell echo " "
+
+# Display the current foreground and background processes
+shell echo " "
+shell echo "List of processes:"
+shell echo " "
+shell ps
+shell echo " "
+
+# Connect GDB to the OpenOCD server using port 3333
+shell echo " "
+shell echo "Connect GDB to the OpenOCD GDB server:"
+target extended-remote localhost:3333
+shell echo " "
+
+# Redirect OpenOCD's log messages to the specified file. This avoids creating
+# duplicate messages from appearing in GDB's output.
+monitor log_output openocd.log
+
+# List the possible debugging targets, and indicate the current target
+shell echo " "
+shell echo "Debugging targets:"
+shell echo " "
+monitor targets
+shell echo " "
+
+# Load the .elf executable file specified on the command line into the Pi's
+# memory. Once this is done, the executable is ready to start running.
+shell echo " "
+shell echo "Load the executable into the Pi's memory:"
+load
+shell echo " "
+
+# Print some basic GDB instructions to the screen
+shell echo " "
+shell echo "Program loaded and ready to debug using GDB:"
+shell echo "Type 'continue' (or 'c') to start the program."
+shell echo "Type control-c to interrupt a running program."
+shell echo "Type 'close' to stop the OpenOCD GDB server."
+shell echo "Type 'detach' to detach GDB from the OpenOCD GDB server."
+shell echo "Type 'q' to quit GDB after detaching."
+shell echo " "
+
+
+# Define a GDB macro to close the OpenOCD Server and detach GDB
+define close
+	monitor shutdown
+	detach
+end
